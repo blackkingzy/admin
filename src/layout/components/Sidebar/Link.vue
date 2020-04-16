@@ -1,13 +1,12 @@
 <template>
-  <!-- eslint-disable vue/require-component-is -->
-  <component v-bind="linkProps(to)">
+  <component :is="type" v-bind="linkProps(to)">
     <slot />
   </component>
 </template>
 
 <script>
+// 这个文件英文vetur大改过
 import { isExternal } from '@/utils/validate'
-
 export default {
   props: {
     to: {
@@ -15,19 +14,28 @@ export default {
       required: true
     }
   },
+  computed: {
+    isExternal() {
+      return isExternal(this.to)
+    },
+    type() {
+      if (this.isExternal) {
+        return 'a'
+      }
+      return 'router-link'
+    }
+  },
   methods: {
-    linkProps(url) {
-      if (isExternal(url)) {
+    linkProps(to) {
+      if (this.isExternal) {
         return {
-          is: 'a',
-          href: url,
+          href: to,
           target: '_blank',
           rel: 'noopener'
         }
       }
       return {
-        is: 'router-link',
-        to: url
+        to: to
       }
     }
   }
