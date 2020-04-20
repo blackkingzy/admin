@@ -32,7 +32,7 @@ export function filterAsyncRoutes(routes, roles) {
   const res = []
 
   routes.forEach(route => {
-    // 复制一份
+    // 复制一份，保证AsyncRoutes的完整性(如果不复制直接采用route,下面的递归会改变AsyncRoutes下的children,之后切换用户,它对比的AsyncRoutes就不是完整的了)
     const tmp = { ...route }
     // 如果用户有访问权则加入结果路由表
     if (hasPermission(roles, tmp)) {
