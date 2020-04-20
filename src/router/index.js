@@ -30,7 +30,7 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-export const constantRoutes = [
+export const constRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
@@ -95,7 +95,7 @@ export const constantRoutes = [
   {
     path: '/nested',
     component: Layout,
-    redirect: '/nested/menu1',
+    redirect: '/nested/menu1/menu1-1',
     name: 'Nested',
     meta: {
       title: 'Nested',
@@ -106,6 +106,7 @@ export const constantRoutes = [
         path: 'menu1',
         component: () => import('@/views/nested/menu1/index'), // Parent router-view
         name: 'Menu1',
+        redirect: 'noRedirect', //面包屑置灰，不可点击
         meta: { title: 'Menu1' },
         children: [
           {
@@ -118,6 +119,7 @@ export const constantRoutes = [
             path: 'menu1-2',
             component: () => import('@/views/nested/menu1/menu1-2'),
             name: 'Menu1-2',
+            redirect: '/nested/menu1/menu1-2/menu1-2-1',
             meta: { title: 'Menu1-2' },
             children: [
               {
@@ -153,7 +155,7 @@ export const constantRoutes = [
   },
 
   {
-    path: 'external-link',
+    path: '/external-link',
     component: Layout,
     children: [
       {
@@ -167,11 +169,31 @@ export const constantRoutes = [
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+export const asyncRoutes = [
+  {
+    path: '/about',
+    component: Layout,
+    redirect: '/about/index',
+    children: [
+      {
+        path: '/about/index',
+        name: 'About',
+        component: () => import('@/views/about/index'),
+        meta: {
+          roles: ['admin'],
+          title: 'About',
+          icon: 'dashboard'
+        }
+      }
+    ]
+  }
+]
+
 const createRouter = () =>
   new Router({
-    mode: 'history', // require service support
+    mode: 'history', // require service support需要服务器的映射支持
     scrollBehavior: () => ({ y: 0 }),
-    routes: constantRoutes
+    routes: constRoutes
   })
 
 const router = createRouter()
