@@ -163,31 +163,22 @@ export const constRoutes = [
         meta: { title: 'External Link', icon: 'link' }
       }
     ]
-  },
+  }
 
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // 为了改善刷新会丢失动态填加的路由问题，将其删除并更换了位置
+  // {
+  //   path: '*', redirect: '/404', hidden: true
+  // }
 ]
 
-export const asyncRoutes = [
-  {
-    path: '/about',
-    component: Layout,
-    redirect: '/about/index',
-    children: [
-      {
-        path: '/about/index',
-        name: 'About',
-        component: () => import('@/views/about/index'),
-        meta: {
-          roles: ['admin'],
-          title: 'About',
-          icon: 'dashboard'
-        }
-      }
-    ]
-  }
-]
+export const _404 = {
+  path: '*',
+  redirect: '/404',
+  hidden: true
+}
+
+export { asyncRoutes } from './modules/asyncRoutes'
 
 const createRouter = () =>
   new Router({

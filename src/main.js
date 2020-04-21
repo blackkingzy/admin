@@ -13,6 +13,12 @@ import store from './store'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import * as filters from './filters' // global filters
+// register global utility filters
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
+
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 new Vue({

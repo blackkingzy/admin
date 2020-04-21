@@ -1,4 +1,4 @@
-import { constRoutes, asyncRoutes } from '@/router'
+import { constRoutes, asyncRoutes, _404 } from '@/router'
 
 const state = {
   routes: [], // 完整路由表
@@ -17,6 +17,7 @@ const actions = {
     return new Promise(resolve => {
       //根据角色进行过滤
       const accessRoutes = filterAsyncRoutes(asyncRoutes, roles)
+      accessRoutes.push(_404) //将404动态添加进去,且放到最后
       commit('SET_ROUTES', accessRoutes)
       resolve(accessRoutes)
     })
