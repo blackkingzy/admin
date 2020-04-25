@@ -163,6 +163,34 @@ export const constRoutes = [
         meta: { title: 'External Link', icon: 'link' }
       }
     ]
+  },
+  {
+    path: '/article',
+    component: Layout,
+    redirect: '/article/list',
+    name: 'Article',
+    meta: { title: 'Article Manage', icon: '' },
+    children: [
+      {
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/article/list/index'),
+        meta: { title: 'Article List', icon: '' }
+      },
+      {
+        path: 'create',
+        name: 'Create',
+        component: () => import('@/views/article/create/index'),
+        meta: { title: 'Create Article', icon: '' }
+      },
+      {
+        path: 'edit/:id',
+        name: 'Edit',
+        hidden: true,
+        component: () => import('@/views/article/edit/index'),
+        meta: { title: 'Edit Article' }
+      }
+    ]
   }
 
   // 404 page must be placed at the end !!!
