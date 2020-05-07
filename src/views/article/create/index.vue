@@ -1,18 +1,18 @@
 <template>
-  <div class="container_write">
+  <div class="container_write" v-loading.fullscreen="loading">
     <div class="main">
       <div class="article-form">
         <div class="title">
           <el-input
-            v-model="title"
+            v-model="articleForm.title"
             placeholder="请输入标题..."
             size="large"
           ></el-input>
         </div>
         <div class="label">
-          <template v-if="selectedTags.length > 0">
+          <template v-if="articleForm.tags.length > 0">
             <el-tag
-              v-for="tag in selectedTags"
+              v-for="tag in articleForm.tags"
               :key="tag"
               closable
               @close="handleClose(tag)"
@@ -23,26 +23,36 @@
             <span>请务必选择标签</span>
           </template>
         </div>
-        <div class="label_select">
-          <el-popover
-            title="标签选择"
-            placement="left-start"
-            width="300"
-            trigger="hover"
-          >
-            <div class="label_content">
-              <el-tag
-                v-for="(tag, index) in tags"
-                :key="index"
-                @click="handleChange(tag)"
-                >{{ tag }}</el-tag
-              >
-            </div>
-            <el-button slot="reference">标签选择</el-button>
-          </el-popover>
+        <div class="button_list">
+          <div class="label_select">
+            <el-popover
+              title="标签选择"
+              placement="left-start"
+              width="300"
+              trigger="hover"
+            >
+              <div class="label_content">
+                <el-tag
+                  v-for="(tag, index) in tagList"
+                  :key="index"
+                  @click="handleChange(tag)"
+                  >{{ tag }}</el-tag
+                >
+              </div>
+              <el-button slot="reference">标签选择</el-button>
+            </el-popover>
+          </div>
+          <div class="button_right">
+            <el-button size="medium" type="primary" @click="saveDraft"
+              >保存草稿</el-button
+            >
+            <el-button size="medium" type="success" @click="publish"
+              >发布文章</el-button
+            >
+          </div>
         </div>
         <div class="editor">
-          <mavon-editor v-model="value" />
+          <mavon-editor v-model="articleForm.content" />
         </div>
       </div>
     </div>
@@ -60,10 +70,21 @@ export default {
   props: [''],
   data() {
     return {
-      title: '',
-      value: 'zzzzzzzzzzzzzzzzzzz',
-      tags: ['前端', '后端', '爱好', '笔记'],
-      selectedTags: []
+      articleForm: {
+        title: '',
+        tags: [],
+        content: ''
+      },
+      rules: {
+        title: [{ required: true, message: '请输入文章标题' }],
+        tags: [{ required: true, message: '请选择标签' }],
+        content: [
+          { required: true, message: '请输入文章内容' },
+          { min: 5, message: '文章内容最少 5 个字符' }
+        ]
+      },
+      tagList: ['前端', '后端', '爱好', '笔记'],
+      loading: false
     }
   },
 
@@ -76,15 +97,82 @@ export default {
   methods: {
     // 删除标签(参数来自组件内部的emit)
     handleChange(tag) {
-      if (!this.selectedTags.includes(tag)) {
-        this.selectedTags.push(tag)
+      if (!this.articleForm.tags.includes(tag)) {
+        this.articleForm.tags.push(tag)
       } else {
-        const index = this.selectedTags.indexOf(tag)
-        this.selectedTags.splice(index, 1)
+        const index = this.articleForm.tags.indexOf(tag)
+        this.articleForm.tags.splice(index, 1)
       }
     },
     handleClose(tag) {
-      this.selectedTags.splice(this.selectedTags.indexOf(tag), 1)
+      this.articleForm.tags.splice(this.articleForm.tags.indexOf(tag), 1)
+    },
+    saveDraft() {},
+    publish() {
+      this.validate()
+        .then(_v => {
+          //进行提交确认操作
+          this.$confirm('确认要发布文章?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'info'
+          })
+            .then(() => {
+              //点击完确认之后向后台发出请求
+              this.loading = true
+              this.$store
+                .dispatch('article/createArticle', this.articleForm)
+                .then(data => {
+                  this.loading = false
+                  this.$notify({
+                    title: '成功',
+                    message: '创建文章成功',
+                    type: 'success'
+                  })
+                  this.$router.push('/article/list')
+                })
+                .catch(error => {
+                  console.log('shibai')
+                })
+            })
+            .catch(() => {})
+        })
+        .catch(_v => {
+          console.log(_v)
+        })
+    },
+    validate() {
+      return new Promise((resolve, reject) => {
+        let hasError = false
+        for (let key in this.articleForm) {
+          for (let rule of this.rules[key]) {
+            //内部自定义规则都在此遍历
+            //对于required规则的判断
+            if (
+              rule.required && this.articleForm[key] instanceof Array
+                ? this.articleForm[key].length === 0
+                : !this.articleForm[key]
+            ) {
+              this.$message.error(rule.message)
+              hasError = true
+              break
+            }
+            //对于文章最少字符的判断
+            if (rule.min) {
+              if (this.articleForm.content.length < rule.min) {
+                this.$message.error(rule.message)
+                hasError = true
+                break
+              }
+            }
+          }
+          if (hasError) {
+            reject(hasError)
+            break
+          }
+        }
+        hasError ? '' : resolve(hasError)
+      })
     }
   },
 
@@ -118,5 +206,9 @@ export default {
 }
 .label_select {
   margin-bottom: 10px;
+}
+.button_list {
+  display: flex;
+  justify-content: space-between;
 }
 </style>
