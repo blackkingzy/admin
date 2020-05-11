@@ -7,3 +7,12 @@ export function create(data) {
     data // 注意post请求，如果这里是data，会放在请求体中，如果是params就会拼接在url后面
   })
 }
+export function imgUpload(data, headers) {
+  console.log(data)
+  return request({
+    url: '/article/imgUpload',
+    method: 'post',
+    data,
+    headers
+  })
+}

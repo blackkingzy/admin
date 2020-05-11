@@ -13,7 +13,7 @@
       </el-table-column>
       <el-table-column label="Readings" prop="readings"> </el-table-column>
       <el-table-column label="Status" prop="status"> </el-table-column>
-      <el-table-column label="Action" align="center">
+      <el-table-column label="Action" align="center" min-width="150">
         <template slot-scope="scope">
           <el-button
             size="mini"

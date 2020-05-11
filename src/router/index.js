@@ -191,6 +191,23 @@ export const constRoutes = [
         meta: { title: 'Edit Article' }
       }
     ]
+  },
+  // 权限管理路由
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: '/permission/role',
+    alwaysShow: true,
+    name: 'Permission',
+    meta: { title: 'Permission', icon: '' },
+    children: [
+      {
+        path: 'role',
+        name: 'role',
+        component: () => import('@/views/permission/role.vue'),
+        meta: { title: 'Role Permission', icon: '' }
+      }
+    ]
   }
 
   // 404 page must be placed at the end !!!

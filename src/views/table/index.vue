@@ -2,16 +2,13 @@
   <div class="app-container">
     <el-table
       v-loading="listLoading"
-      :data="list"
+      :data="tableData"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" width="95">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
+      <el-table-column align="center" label="ID" prop="id" width="165">
       </el-table-column>
       <el-table-column label="Title">
         <template slot-scope="scope">
@@ -52,6 +49,15 @@
         </template>
       </el-table-column>
     </el-table>
+    <div class="pagination">
+      <el-pagination
+        @current-change="current_change"
+        background
+        layout="prev, pager, next"
+        :page-count="Math.ceil(list.length / pageSize)"
+      >
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -71,12 +77,22 @@ export default {
   },
   data() {
     return {
-      list: null,
-      listLoading: true
+      list: [],
+      listLoading: true,
+      pageSize: 10,
+      currentPage: 1
     }
   },
   created() {
     this.fetchData()
+  },
+  computed: {
+    tableData() {
+      return this.list.slice(
+        (this.currentPage - 1) * this.pageSize,
+        this.currentPage * this.pageSize
+      )
+    }
   },
   methods: {
     fetchData() {
@@ -85,7 +101,17 @@ export default {
         this.list = response.data.items
         this.listLoading = false
       })
+    },
+    current_change(currentPage) {
+      this.currentPage = currentPage
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+</style>
