@@ -71,13 +71,13 @@
 <script>
 import path from 'path'
 import { deepClone } from '@/utils'
-// import {
-//   getRoutes,
-//   getRoles,
-//   addRole,
-//   deleteRole,
-//   updateRole
-// } from '@/api/role'
+import {
+  getRoutes
+  // getRoles,
+  // addRole,
+  // deleteRole,
+  // updateRole
+} from '@/api/role'
 
 const defaultRole = {
   key: '',
@@ -97,7 +97,7 @@ export default {
       checkStrictly: false,
       defaultProps: {
         children: 'children',
-        label: 'title'
+        label: 'name'
       }
     }
   },
@@ -108,15 +108,15 @@ export default {
   },
   created() {
     // Mock: get all routes and roles list from server
-    // this.getRoutes()
+    this.getRoutes()
     // this.getRoles()
   },
   methods: {
-    // async getRoutes() {
-    //   const res = await getRoutes()
-    //   this.serviceRoutes = res.data
-    //   this.routes = this.generateRoutes(res.data)
-    // },
+    async getRoutes() {
+      const res = await getRoutes()
+      // this.serviceRoutes = res.routes
+      this.routes = this.generateRoutes(res.routes)
+    },
     // async getRoles() {
     //   const res = await getRoles()
     //   this.rolesList = res.data
@@ -129,7 +129,53 @@ export default {
     handleEdit(scope) {},
     handleDelete({ $index, row }) {},
     generateTree() {},
-    async confirmRole() {}
+    async confirmRole() {},
+    // Reshape the routes structure so that it looks the same as the sidebar
+    generateRoutes(routes, basePath = '/') {
+      const res = []
+
+      for (let route of routes) {
+        // skip some route
+        if (route.hidden) {
+          continue
+        }
+        const onlyOneShowingChild = this.onlyOneShowingChild(
+          route.children,
+          route
+        )
+        if (route.children && onlyOneShowingChild && !route.alwaysShow) {
+          route = onlyOneShowingChild
+        }
+        const data = {
+          path: path.resolve(basePath, route.path),
+          name: route.meta && route.meta.title
+        }
+        // recursive child routes
+        if (route.children) {
+          data.children = this.generateRoutes(route.children, data.path)
+        }
+        res.push(data)
+      }
+      return res
+    },
+    // reference: src/view/layout/components/Sidebar/SidebarItem.vue
+    onlyOneShowingChild(children = [], parent) {
+      let onlyOneChild = null
+      const showingChildren = children.filter(item => !item.hidden)
+      // When there is only one child route, the child route is displayed by default
+      if (showingChildren.length === 1) {
+        onlyOneChild = showingChildren[0]
+        onlyOneChild.path = path.resolve(parent.path, onlyOneChild.path)
+        return onlyOneChild
+      }
+      // Show parent if there are no child route to display
+      if (showingChildren.length === 0) {
+        onlyOneChild = { ...parent, path: '', noShowingChildren: true }
+        return onlyOneChild
+      }
+
+      return false
+    }
   }
 }
 </script>

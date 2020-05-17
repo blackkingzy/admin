@@ -56,6 +56,7 @@
             ref="md"
             v-model="articleForm.content"
             @imgAdd="$imgAdd"
+            @imgDel="$imgDel"
           />
         </div>
       </div>
@@ -66,7 +67,7 @@
 <script>
 import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
-import { imgUpload } from '@/api/article.js'
+import { imgUpload, imgDelete } from '@/api/article.js'
 export default {
   name: '',
   components: {
@@ -182,9 +183,11 @@ export default {
     // 绑定@imgAdd event
     $imgAdd(pos, $file) {
       // 第一步.将图片上传到服务器.
-      console.log($file)
       let formData = new FormData()
       formData.append('file', $file)
+      //如果用七牛服务器存储图片，可以将下面请求改为俩个请求
+      //先请求自己的服务器看token过期没有，如果过期停止操作
+      //没有过期再向七牛服务器发请求储存照片
       imgUpload(formData, { 'Content-Type': 'multipart/form-data' }).then(
         res => {
           // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
@@ -196,6 +199,15 @@ export default {
           this.$refs.md.$img2Url(pos, res.url)
         }
       )
+    },
+    $imgDel(fileInfo) {
+      const imgName = fileInfo[0].split('upload_images/')[1]
+      imgDelete({ imgName }).then(res => {
+        this.$message({
+          message: res.msg,
+          type: 'success'
+        })
+      })
     }
   },
   watch: {}

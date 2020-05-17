@@ -8,11 +8,17 @@ export function create(data) {
   })
 }
 export function imgUpload(data, headers) {
-  console.log(data)
   return request({
     url: '/article/imgUpload',
     method: 'post',
     data,
     headers
+  })
+}
+export function imgDelete(params) {
+  return request({
+    url: '/article/imgDelete',
+    method: 'delete',
+    params
   })
 }
