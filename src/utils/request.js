@@ -18,7 +18,6 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      console.log(getToken())
       config.headers.Authorization = getToken()
     }
     return config

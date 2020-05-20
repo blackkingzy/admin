@@ -30,6 +30,7 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+// 在本项目中，切记写children路由不能加/，只有根可以，不然不会让addrole页面出错
 export const constRoutes = [
   {
     path: '/login',

@@ -13,6 +13,9 @@ import store from './store'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+import { create } from './utils/create.js'
+Vue.prototype.$create = create
+
 import * as filters from './filters' // global filters
 // register global utility filters
 Object.keys(filters).forEach(key => {
